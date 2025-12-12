@@ -3,6 +3,7 @@ using UnityEngine;
 public class ShootProjectile : MonoBehaviour
 {
     public GameObject bulletPrefab;
+    public Transform shootingPoint;
     public float bulletSpeed = 12f;
     public float fireRate = 0.2f;
 

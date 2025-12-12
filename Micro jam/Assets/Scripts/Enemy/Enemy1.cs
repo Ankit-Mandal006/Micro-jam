@@ -26,7 +26,7 @@ public class Enemy1 : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerHealth>().TakeDamage(damage);
+            GameObject.Find("Player").GetComponent<PlayerHealth>().TakeDamage(damage);
             Destroy(gameObject);
         }
 

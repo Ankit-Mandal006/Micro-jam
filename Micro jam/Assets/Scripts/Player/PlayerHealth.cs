@@ -3,11 +3,19 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
+    public static PlayerHealth Instance;   // static reference
+
     public int maxHealth = 5;
     public int currentHealth;
 
-    public Image healthBar;       
-    public GameObject deathScreen; 
+    public Image healthBar;
+    public GameObject deathScreen;
+
+    void Awake()
+    {
+        // cache the single PlayerHealth so other scripts can call PlayerHealth.Instance
+        Instance = this;
+    }
 
     void Start()
     {
@@ -20,7 +28,6 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-
         UpdateHealthUI();
 
         if (currentHealth <= 0)

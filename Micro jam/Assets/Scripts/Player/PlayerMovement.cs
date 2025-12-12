@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
     public float dashSpeed = 15f;
     public float dashTime = 0.15f;
 
+    public float rotationSpeed = 720f; // degrees per second
+
     bool isDashing;
     float dashTimer;
 
@@ -16,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 dir = (mouse - transform.position).normalized;
 
+        // movement
         if (!isDashing)
             transform.position += dir * moveSpeed * Time.deltaTime;
 
@@ -32,6 +35,19 @@ public class PlayerMovement : MonoBehaviour
 
             if (dashTimer <= 0)
                 isDashing = false;
+        }
+
+        // rotation towards mouse
+        if (dir.sqrMagnitude > 0.0001f)
+        {
+            float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;   // angle for 2D topdown[web:33][web:186]
+            Quaternion targetRot = Quaternion.Euler(0f, 0f, targetAngle);
+
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRot,
+                rotationSpeed * Time.deltaTime
+            );                                                                // smooth rotate[web:27][web:193]
         }
     }
 }
