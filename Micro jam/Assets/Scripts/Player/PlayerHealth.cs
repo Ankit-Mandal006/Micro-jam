@@ -4,12 +4,14 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     public static PlayerHealth Instance;   // static reference
-
+    public Animator animFlash,animShake;
     public int maxHealth = 5;
     public int currentHealth;
 
     public Image healthBar;
     public GameObject deathScreen;
+    public AudioSource audioSource;
+
 
     void Awake()
     {
@@ -27,9 +29,11 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        audioSource.Play();
         currentHealth -= amount;
         UpdateHealthUI();
-
+        animFlash.SetTrigger("Damage");
+        animShake.SetTrigger("Shake");
         if (currentHealth <= 0)
         {
             Die();
@@ -42,6 +46,11 @@ public class PlayerHealth : MonoBehaviour
         {
             healthBar.fillAmount = (float)currentHealth / maxHealth;
         }
+    }
+    public void RestoreFullHealth()
+    {
+    currentHealth = maxHealth;
+    UpdateHealthUI();
     }
 
     void Die()

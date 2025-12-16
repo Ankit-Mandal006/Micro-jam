@@ -35,6 +35,6 @@ public class PlayerAmmo : MonoBehaviour
     void UpdateAmmoUI()
     {
         if (ammoText != null)
-            ammoText.text = currentAmmo.ToString();
+            ammoText.text = "Ammo : "+currentAmmo.ToString();
     }
 }

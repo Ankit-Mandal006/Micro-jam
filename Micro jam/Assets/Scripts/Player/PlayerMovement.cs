@@ -5,22 +5,36 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 6f;
     public float dashSpeed = 15f;
     public float dashTime = 0.15f;
+    public float turnLerp = 10f;
 
-    public float rotationSpeed = 720f; // degrees per second
+    // ✅ ADDED
+    public Vector2 minBounds;
+    public Vector2 maxBounds;
 
     bool isDashing;
     float dashTimer;
 
+    Vector3 moveDir = Vector3.up;
+
     void Update()
     {
-        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = 0;
+        float x = 0f, y = 0f;
+        if (Input.GetKey(KeyCode.A)) x -= 1f;
+        if (Input.GetKey(KeyCode.D)) x += 1f;
+        if (Input.GetKey(KeyCode.S)) y -= 1f;
+        if (Input.GetKey(KeyCode.W)) y += 1f;
 
-        Vector3 dir = (mouse - transform.position).normalized;
+        Vector3 inputDir = new Vector3(x, y, 0f);
 
-        // movement
-        if (!isDashing)
-            transform.position += dir * moveSpeed * Time.deltaTime;
+        if (inputDir.sqrMagnitude > 0.001f)
+        {
+            inputDir.Normalize();
+            moveDir = Vector3.Lerp(moveDir, inputDir, Time.deltaTime * turnLerp);
+            moveDir.Normalize();
+        }
+
+        float speed = isDashing ? dashSpeed : moveSpeed;
+        transform.position += moveDir * speed * Time.deltaTime;
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -30,24 +44,36 @@ public class PlayerMovement : MonoBehaviour
 
         if (isDashing)
         {
-            transform.position += dir * dashSpeed * Time.deltaTime;
             dashTimer -= Time.deltaTime;
-
-            if (dashTimer <= 0)
-                isDashing = false;
+            if (dashTimer <= 0f) isDashing = false;
         }
 
-        // rotation towards mouse
-        if (dir.sqrMagnitude > 0.0001f)
+        if (moveDir.sqrMagnitude > 0.001f)
         {
-            float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;   // angle for 2D topdown[web:33][web:186]
-            Quaternion targetRot = Quaternion.Euler(0f, 0f, targetAngle);
-
-            transform.rotation = Quaternion.RotateTowards(
+            float angle = Mathf.Atan2(moveDir.y, moveDir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                targetRot,
-                rotationSpeed * Time.deltaTime
-            );                                                                // smooth rotate[web:27][web:193]
+                Quaternion.Euler(0f, 0f, angle),
+                Time.deltaTime * turnLerp
+            );
         }
+
+        // ✅ CLAMP — MUST BE LAST
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, minBounds.x, maxBounds.x);
+        pos.y = Mathf.Clamp(pos.y, minBounds.y, maxBounds.y);
+        transform.position = pos;
+    }
+
+    public void StartSpeedBoost(float amount, float duration)
+    {
+        moveSpeed = 12f;
+        CancelInvoke();
+        Invoke(nameof(ResetSpeed), duration);
+    }
+
+    void ResetSpeed()
+    {
+        moveSpeed = 6f;
     }
 }

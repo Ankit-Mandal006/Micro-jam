@@ -63,19 +63,20 @@ public class ShootProjectile : MonoBehaviour
     }
 
     void Shoot()
-    {
-        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = 0;
+{
+    Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    mouse.z = 0;
 
-        Vector3 dir = (mouse - transform.position).normalized;
+    Vector3 dir = (mouse - transform.position).normalized;
 
-        GameObject b = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+    GameObject b = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
 
-        Bullet bullet = b.GetComponent<Bullet>();
-        if (bullet != null)
-            bullet.bulletType = currentBulletType;
+    Bullet bullet = b.GetComponent<Bullet>();
+    if (bullet != null)
+        bullet.SetType(currentBulletType);   // sets type + sprite
 
-        Rigidbody2D rb = b.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = dir * bulletSpeed;
-    }
+    Rigidbody2D rb = b.GetComponent<Rigidbody2D>();
+    rb.linearVelocity = dir * bulletSpeed;
+}
+
 }
